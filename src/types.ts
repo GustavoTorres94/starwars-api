@@ -38,3 +38,9 @@ export type ContextPlanetType = {
   },
   setPlanets: (param: any) => any;
 };
+
+export type SearchType = {
+  column: string;
+  comparison: string;
+  value: number;
+};

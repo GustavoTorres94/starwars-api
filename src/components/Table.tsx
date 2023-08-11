@@ -1,11 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
-import { PlanetType } from '../types';
+import { PlanetType, SearchType } from '../types';
 import GlobalContext from '../context/globalContext';
 import getPlanets from '../services/getPlanets';
 
 function Table() {
+  const INITIAL_STATE = {
+    column: 'population',
+    comparison: 'maior que',
+    value: 0,
+  };
+
   const { planets, setPlanets } = useContext(GlobalContext);
   const [savedPlanets, setSavedPlanets] = useState<PlanetType[]>([]);
+  const [search, setSearch] = useState<SearchType>(INITIAL_STATE);
 
   useEffect(() => {
     const fetchPlanets = async () => {
@@ -26,6 +33,30 @@ function Table() {
     }
   };
 
+  const handleSelect = (
+    e: React.ChangeEvent<HTMLSelectElement> |
+    React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const { name, value } = e.target;
+    setSearch({ ...search, [name]: value });
+  };
+
+  const handleClick = () => {
+    const { column, comparison, value } = search;
+    console.log(column, comparison, value);
+    const filteredPlanets = planets
+      .filter((planet: SearchType) => {
+        if (comparison === 'maior que') {
+          return Number(planet[column]) > Number(value);
+        }
+        if (comparison === 'menor que') {
+          return Number(planet[column]) < Number(value);
+        }
+        return Number(planet[column]) === Number(value);
+      });
+    setPlanets(filteredPlanets);
+  };
+
   return (
     <div>
       <form>
@@ -36,6 +67,51 @@ function Table() {
           data-testid="name-filter"
           onChange={ handleChange }
         />
+        <label htmlFor="select-filter">
+          <p>Coluna:</p>
+          <select
+            name="column"
+            id="select-filter"
+            data-testid="column-filter"
+            value={ search.column }
+            onChange={ handleSelect }
+          >
+            <option value="population">population</option>
+            <option value="orbital_period">orbital_period</option>
+            <option value="diameter">diameter</option>
+            <option value="ratation_period">rotation_period</option>
+            <option value="surface_water">surface_water</option>
+          </select>
+        </label>
+        <label htmlFor="comparison-filter">
+          <p>Operador:</p>
+          <select
+            name="comparison"
+            id="comparison-filter"
+            data-testid="comparison-filter"
+            value={ search.comparison }
+            onChange={ handleSelect }
+          >
+            <option value="maior que">maior que</option>
+            <option value="menor que">menor que</option>
+            <option value="igual a">igual a</option>
+          </select>
+        </label>
+        <input
+          type="number"
+          name="value"
+          id="number-input"
+          data-testid="value-filter"
+          value={ search.value }
+          onChange={ handleSelect }
+        />
+        <button
+          type="button"
+          data-testid="button-filter"
+          onClick={ handleClick }
+        >
+          FILTRAR
+        </button>
       </form>
       <table>
         <thead>
