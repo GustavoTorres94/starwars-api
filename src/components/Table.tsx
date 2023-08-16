@@ -10,7 +10,7 @@ function Table() {
     value: 0,
   };
 
-  const INITAIAL_OPTIONS = [
+  const INITIAL_OPTIONS = [
     'population',
     'orbital_period',
     'diameter',
@@ -21,8 +21,8 @@ function Table() {
   const { planets, setPlanets } = useContext(GlobalContext);
   const [savedPlanets, setSavedPlanets] = useState<PlanetType[]>([]);
   const [search, setSearch] = useState<SearchType>(INITIAL_STATE);
-  const [options, setOptions] = useState<string[]>(INITAIAL_OPTIONS);
-  const [history, setHistory] = useState<SearchType[]>([]);
+  const [options, setOptions] = useState<string[]>(INITIAL_OPTIONS);
+  const [filters, setFilters] = useState<SearchType[]>([]);
 
   useEffect(() => {
     const fetchPlanets = async () => {
@@ -64,9 +64,10 @@ function Table() {
         return Number(planet[column]) === Number(value);
       });
     setPlanets(filteredPlanets);
-    setHistory([...history, search]);
-    const newOptions = options.filter((option: string) => option !== column);
+    setFilters([...filters, search]);
+    const newOptions = options.filter((option: string) => option !== search.column);
     setOptions(newOptions);
+    setSearch(INITIAL_STATE);
   };
 
   return (
