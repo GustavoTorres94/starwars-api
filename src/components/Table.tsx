@@ -10,9 +10,19 @@ function Table() {
     value: 0,
   };
 
+  const INITAIAL_OPTIONS = [
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ];
+
   const { planets, setPlanets } = useContext(GlobalContext);
   const [savedPlanets, setSavedPlanets] = useState<PlanetType[]>([]);
   const [search, setSearch] = useState<SearchType>(INITIAL_STATE);
+  const [options, setOptions] = useState<string[]>(INITAIAL_OPTIONS);
+  const [history, setHistory] = useState<SearchType[]>([]);
 
   useEffect(() => {
     const fetchPlanets = async () => {
@@ -43,7 +53,6 @@ function Table() {
 
   const handleClick = () => {
     const { column, comparison, value } = search;
-    console.log(column, comparison, value);
     const filteredPlanets = planets
       .filter((planet: SearchType) => {
         if (comparison === 'maior que') {
@@ -55,6 +64,9 @@ function Table() {
         return Number(planet[column]) === Number(value);
       });
     setPlanets(filteredPlanets);
+    setHistory([...history, search]);
+    const newOptions = options.filter((option: string) => option !== column);
+    setOptions(newOptions);
   };
 
   return (
@@ -76,11 +88,11 @@ function Table() {
             value={ search.column }
             onChange={ handleSelect }
           >
-            <option value="population">population</option>
-            <option value="orbital_period">orbital_period</option>
-            <option value="diameter">diameter</option>
-            <option value="ratation_period">rotation_period</option>
-            <option value="surface_water">surface_water</option>
+            {
+              options.map((option: string, i: number) => (
+                <option key={ i } value={ option }>{option}</option>
+              ))
+            }
           </select>
         </label>
         <label htmlFor="comparison-filter">
