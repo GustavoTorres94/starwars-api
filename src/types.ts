@@ -40,6 +40,7 @@ export type ContextPlanetType = {
 };
 
 export type SearchType = {
+  id: number;
   column: string;
   comparison: string;
   value: number;

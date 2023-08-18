@@ -23,6 +23,7 @@ function Table() {
   const [search, setSearch] = useState<SearchType>(INITIAL_STATE);
   const [options, setOptions] = useState<string[]>(INITIAL_OPTIONS);
   const [filters, setFilters] = useState<SearchType[]>([]);
+  const [id, setId] = useState<number>(1);
 
   useEffect(() => {
     const fetchPlanets = async () => {
@@ -48,11 +49,18 @@ function Table() {
     React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { name, value } = e.target;
-    setSearch({ ...search, [name]: value });
+    setSearch({ ...search,
+      [name]: value });
   };
 
   const handleClick = () => {
     const { column, comparison, value } = search;
+    const newFilter = {
+      id,
+      column,
+      comparison,
+      value: Number(value),
+    };
     const filteredPlanets = planets
       .filter((planet: SearchType) => {
         if (comparison === 'maior que') {
@@ -64,10 +72,41 @@ function Table() {
         return Number(planet[column]) === Number(value);
       });
     setPlanets(filteredPlanets);
-    setFilters([...filters, search]);
+    setFilters([...filters, newFilter]);
     const newOptions = options.filter((option: string) => option !== search.column);
     setOptions(newOptions);
+    setId(id + 1);
     setSearch(INITIAL_STATE);
+  };
+
+  const handleRemove = (param: number) => {
+    const newFilters = filters.filter((filter: SearchType) => filter.id !== param);
+    setFilters(newFilters);
+    const newOptions = [...options, filters
+      .find((filter: SearchType) => filter.id === param)?.column];
+    setOptions(newOptions);
+
+    const filteredPlanets = newFilters.reduce((filtered, filter) => {
+      const { column, comparison, value } = filter;
+      return filtered.filter((planet: PlanetType) => {
+        if (comparison === 'maior que') {
+          return Number(planet[column]) > Number(value);
+        } if (comparison === 'menor que') {
+          return Number(planet[column]) < Number(value);
+        } return Number(planet[column]) === Number(value);
+      });
+    }, savedPlanets);
+
+    setPlanets(filteredPlanets);
+    if (newFilters.length === 0) {
+      setPlanets(savedPlanets);
+    }
+  };
+
+  const handleClear = () => {
+    setPlanets(savedPlanets);
+    setFilters([]);
+    setOptions(INITIAL_OPTIONS);
   };
 
   return (
@@ -126,6 +165,35 @@ function Table() {
           FILTRAR
         </button>
       </form>
+      <div>
+        {
+          filters.map((filter: SearchType) => (
+            <div key={ filter.id }>
+              <p data-testid="filter">
+                {filter.column}
+                {' '}
+                {filter.comparison}
+                {' '}
+                {filter.value}
+                {' '}
+                <button
+                  type="button"
+                  onClick={ () => handleRemove(filter.id) }
+                >
+                  X
+                </button>
+              </p>
+            </div>
+          ))
+        }
+      </div>
+      <button
+        type="button"
+        data-testid="button-remove-filters"
+        onClick={ handleClear }
+      >
+        LIMPAR TODOS OS FILTROS
+      </button>
       <table>
         <thead>
           <tr>
