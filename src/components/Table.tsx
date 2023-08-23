@@ -17,6 +17,7 @@ function Table() {
   useEffect(() => {
     const fetchPlanets = async () => {
       const data = await getPlanets(); setPlanets(data); setSavedPlanets(data);
+      console.log(savedPlanets);
     }; fetchPlanets();
   }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +35,7 @@ function Table() {
       setOrder({ ...order, column: value });
     }
   };
+
   const handleClick = () => {
     const { column, comparison, value } = search;
     const newFilter = { id, column, comparison, value: Number(value) };

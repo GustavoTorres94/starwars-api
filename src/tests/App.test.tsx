@@ -1,6 +1,12 @@
 import { render, screen, within } from '@testing-library/react';
-import App from '../App';
+import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import mockData from './mocks/mockData';
+import App from '../App';
+
+global.fetch = vi.fn().mockResolvedValue({
+  json: async () => (mockData),
+});
 
 describe('App Without Api Return', () => {
   it('testing without API request return, no functions', () => {
