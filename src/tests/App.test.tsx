@@ -3,14 +3,26 @@ import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import mockData from './mocks/mockData';
 import App from '../App';
+import PlanetProvider from '../context/globalProvider';
 
-global.fetch = vi.fn().mockResolvedValue({
-  json: async () => (mockData),
+
+beforeEach(async () => {
+  global.fetch = vi.fn().mockResolvedValue({
+    json: async () => mockData
+  });
 });
 
+afterEach(() => {
+  vi.clearAllMocks();
+});
 describe('App Without Api Return', () => {
   it('testing without API request return, no functions', () => {
-    render(<App />);
+    render (
+    <PlanetProvider>
+      <App />
+    </PlanetProvider>
+    );
+
     const searchBar = screen.getByRole('searchbox');
     const column = screen.getByText(/coluna:/i);
     const operator = screen.getByText(/operador:/i);
@@ -30,17 +42,28 @@ describe('App Without Api Return', () => {
     expect(clearAllBtn).toBeInTheDocument();
     expect(desc).toBeInTheDocument();
   });
-  it('testing without API request return, with functions', () => {
-    render(<App />);
-    const lastColumnHeader = screen.getByRole('columnheader', {  name: /url/i});
-    const firstColumnHeader = screen.getByRole('columnheader', {  name: /name/i});
+  it('testing without API request return, with functions', async () => {
+
+    render (
+      <PlanetProvider>
+        <App />
+      </PlanetProvider>
+      );
+    const lastColumnHeader = await screen.findByRole('columnheader', {  name: /url/i});
+    const firstColumnHeader = await screen.findByRole('columnheader', {  name: /name/i});
     const table = screen.getAllByRole('table')[0];
     expect(lastColumnHeader).toBeInTheDocument();
     expect(firstColumnHeader).toBeInTheDocument();
     expect(table).toBeInTheDocument();
+    screen.debug();
   });
   it('testing with API request return, with functions', async () => {
-    render(<App />);
+
+    render (
+      <PlanetProvider>
+        <App />
+      </PlanetProvider>
+      );
     const dropdown = screen.getByTestId('column-filter');
     expect(dropdown).toBeInTheDocument();
     await userEvent.click(dropdown);
@@ -62,7 +85,6 @@ describe('App Without Api Return', () => {
     const table = screen.getAllByRole('table')[0];
     expect(table).toBeInTheDocument();
     const tableRows = screen.getAllByRole('row');
-    screen.debug();    
     expect(tableRows).toHaveLength(1);
   });
 });
