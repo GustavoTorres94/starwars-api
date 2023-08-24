@@ -17,7 +17,6 @@ function Table() {
   useEffect(() => {
     const fetchPlanets = async () => {
       const data = await getPlanets(); setPlanets(data); setSavedPlanets(data);
-      console.log(savedPlanets);
     }; fetchPlanets();
   }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,12 +44,9 @@ function Table() {
         return Number(planet[column]) < Number(value);
       } return Number(planet[column]) === Number(value);
     });
-    setPlanets(filteredPlanets);
-    setFilters([...filters, newFilter]);
+    setPlanets(filteredPlanets); setFilters([...filters, newFilter]);
     const newOptions = options.filter((option: string) => option !== search.column);
-    setOptions(newOptions);
-    setId(id + 1);
-    setSearch(INITIAL_STATE);
+    setOptions(newOptions); setId(id + 1); setSearch(INITIAL_STATE);
   };
   const handleRemove = (param: number) => {
     const newFilters = filters.filter((filter: SearchType) => filter.id !== param);
